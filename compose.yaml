@@ -1,0 +1,56 @@
+services:
+  database:
+    image: postgres:16-alpine
+    restart: unless-stopped
+
+    environment:
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: postgres
+      POSTGRES_DB: tickets_db
+
+    ports:
+      - "5432:5432"
+
+    volumes:
+      - database_data:/var/lib/postgresql/data
+
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U postgres -d tickets_db"]
+      interval: 5s
+      timeout: 5s
+      retries: 10
+
+  backend:
+    build:
+      context: ./backend
+
+    restart: unless-stopped
+
+    ports:
+      - "4000:4000"
+
+    environment:
+      DATABASE_URL: "postgresql://postgres:postgres@database:5432/tickets_db?schema=public"
+
+    depends_on:
+      database:
+        condition: service_healthy
+
+    command: >
+      sh -c "pnpm exec prisma migrate deploy &&
+             pnpm run dev"
+
+  frontend:
+    build:
+      context: ./frontend
+
+    restart: unless-stopped
+
+    ports:
+      - "3000:3000"
+
+    depends_on:
+      - backend
+
+volumes:
+  database_data:
