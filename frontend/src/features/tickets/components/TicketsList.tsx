@@ -43,28 +43,44 @@ export const TicketList = () => {
   };
 
   if (loading) {
-    return <p>Loading...</p>;
+    return (
+      <p className="mx-auto max-w-5xl rounded-md bg-white p-6 text-slate-600 shadow-sm">
+        Loading...
+      </p>
+    );
   }
 
   return (
-    <div>
-      <h1>Tickets</h1>
+    <section className="mx-auto max-w-5xl">
+      <div className="mb-6">
+        <h1 className="text-3xl font-semibold tracking-tight text-slate-950">
+          Tickets
+        </h1>
+      </div>
 
       <TicketForm onCreated={loadTickets} />
 
-      {tickets.map((ticket) => (
-        <TicketCard
-          key={ticket.id}
-          id={ticket.id}
-          title={ticket.title}
-          description={ticket.description}
-          status={ticket.status}
-          priority={ticket.priority}
-          createdAt={ticket.createdAt}
-          onDelete={handleDelete}
-          onUpdated={loadTickets}
-        />
-      ))}
-    </div>
+      <div className="mt-6 space-y-4">
+        {tickets.length === 0 ? (
+          <div className="rounded-md border border-dashed border-slate-300 bg-white p-8 text-center text-slate-500">
+            No tickets yet.
+          </div>
+        ) : (
+          tickets.map((ticket) => (
+            <TicketCard
+              key={ticket.id}
+              id={ticket.id}
+              title={ticket.title}
+              description={ticket.description}
+              status={ticket.status}
+              priority={ticket.priority}
+              createdAt={ticket.createdAt}
+              onDelete={handleDelete}
+              onUpdated={loadTickets}
+            />
+          ))
+        )}
+      </div>
+    </section>
   );
 };
